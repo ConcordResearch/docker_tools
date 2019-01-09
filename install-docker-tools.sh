@@ -7,6 +7,15 @@ curl -L "${BASE}/docker-machine-`uname -s`-`uname -m`" > /tmp/docker-machine
 chmod +x /tmp/docker-machine
 cp /tmp/docker-machine /usr/local/bin/docker-machine
 
+BOOT_TO_DOCKER_ISO_VERSION="v18.09.0"
+BASE="https://github.com/boot2docker/boot2docker/releases/download/${BOOT_TO_DOCKER_ISO_VERSION}"
+curl -L "${BASE}/boot2docker.iso" > /tmp/boot2docker.iso
+mkdir -p "${HOME}/iso/"
+cp /tmp/boot2docker.iso "${HOME}/iso/"
+# We were getting "Unable to get the local Boot2Docker ISO version: Did not find prefix "-v" in version string"
+# https://github.com/boot2docker/boot2docker/issues/1347
+# printf '\x2D\x76\x31\x38\x2E\x30\x39\x2E\x30\x20' | dd of="${HOME}/iso/boot2docker.iso" bs=1 seek=32819 count=10 conv=notrunc
+
 DOCKER_MACHINE_KVM_VERSION="v0.10.0"
 BASE="https://github.com/dhiltgen/docker-machine-kvm/releases/download/${DOCKER_MACHINE_KVM_VERSION}"
 curl -L "$BASE/docker-machine-driver-kvm-ubuntu16.04" > /tmp/docker-machine-driver-kvm

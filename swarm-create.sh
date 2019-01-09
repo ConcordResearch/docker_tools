@@ -12,6 +12,7 @@ NODES_LEN=${#NODES[@]}
 LEADER_NODE="${NODES[0]}"
 LEADER_COUNT=${LEADER_COUNT:=3}
 
+#BOOT2DOCKER_ISO="${HOME}/iso/boot2docker.iso"
 echo "Create ${NODES_LEN} node docker swarm"
 echo ""
 for (( index=0; index<${NODES_LEN}; index++ ));
@@ -20,7 +21,12 @@ do
   retVal=$?
   if [ $retVal -eq 1 ]; then
     echo "Create '${NODES[index]}' node"
-    docker-machine create --driver virtualbox ${NODES[index]} &> /dev/null
+    # docker-machine create --driver virtualbox \
+    #                         --virtualbox-boot2docker-url ${BOOT2DOCKER_ISO} \
+    #                          ${NODES[index]} &> /dev/null
+
+    docker-machine create --driver virtualbox \
+                          ${NODES[index]} &> /dev/null
   fi
 done
 echo ""
