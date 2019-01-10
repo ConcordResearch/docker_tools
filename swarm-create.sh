@@ -12,11 +12,19 @@ NODES_LEN=${#NODES[@]}
 LEADER_NODE="${NODES[0]}"
 LEADER_COUNT=${LEADER_COUNT:=3}
 
+DIR="/fake-nas"
+if [ ! -d $DIR ]; then
+  echo "Making ${DIR}"
+  sudo mkdir -p "${DIR}"
+  sudo chown -R "${USER}":"${USER}" "${DIR}"
+fi
+
 #BOOT2DOCKER_ISO="${HOME}/iso/boot2docker.iso"
 echo "Create ${NODES_LEN} node docker swarm"
 echo ""
 for (( index=0; index<${NODES_LEN}; index++ ));
 do
+  sudo mkdir -p "${DIR}/${NODES[index]}"
   docker-machine status ${NODES[index]} &> /dev/null
   retVal=$?
   if [ $retVal -eq 1 ]; then
@@ -27,6 +35,12 @@ do
 
     docker-machine create --driver virtualbox \
                           ${NODES[index]} &> /dev/null
+    docker-machine ssh "${NODES[index]}" sudo mkdir -p "/data"
+    # docker-machine mount "${NODES[index]}:/data" "${DIR}/${NODES[index]}"
+
+    # For each docker-machine created we need to register its name in our local hosts file
+    # https://github.com/cbednarski/hostess
+    # hostess add ${MACHINE_NAME} ${MACHINE_IP}
   fi
 done
 echo ""
